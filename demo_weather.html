@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/bootstrap5.3/bootstrap-5.3.0-alpha1-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/font_awesome/fontawesome-free-6.3.0-web/css/all.min.css">
+    <script src="https://momentjs.com/downloads/moment.js"></script>
+    <style>
+        .text{
+            opacity: 0.8;
+            margin-left: 3.8rem;
+            color: white;
+            font-size: 18px;
+        }
+        .icon-sun{
+            width: 90%;
+            margin-left: -21px;
+        }
+        .w-30{
+            width: 30%;
+        }
+        .rtl{
+            direction: rtl;
+        }
+        </style>
+    <title>Weather Forecast</title>
+</head>
+<body>
+    <section>
+        <div class="container bg-info text-white w-30">
+            <div class="rtl me-4 fs-3 "><a href="#" class="text-decoration-none text-white">...</a></div>
+        </div>
+    </section>
+</body>
+<script>
+    var xhttp=new XMLHttpRequest();
+    xhttp.onload=function(){
+        let rs=xhttp.responseText;
+        let weather=JSON.parse(rs);
+        console.log(weather.dt);
+        let html="";
+        let d=weather.dt;
+        let a=new Date(d);
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        let iconcode=weather.weather[0].icon;
+        let iconurl="http://openweathermap.org/img/w/" + iconcode + ".png";
+        let contain=document.querySelector(".container");
+        let timezone=weather.timezone;
+        let sr=moment.utc(weather.sys.sunrise,"X").add(timezone,"seconds").format('HH:mm a');
+        let ss=moment.utc(weather.sys.sunset,"X").add(timezone,"seconds").format('HH:mm a');
+        let dir=["N","NNE","NE","ENE","E","ESE", "SE", "South-Southeast ","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+        let deg=parseInt((weather.wind.deg/22.5)+0.5);
+        
+
+        contain.innerHTML+=`
+        <div class="row">
+                <div class="col">
+                    <div class="row">
+                        <div class="d-flex align-items-center"><i class="fa-solid fa-location-dot mx-4"></i> <div class="fs-2">${weather.name}</div></div>
+                        <div class="text fs-5">${a.toLocaleDateString('en-US',{month:"long",day:"numeric"})} </div>
+                        <div class="text">${daysOfWeek[a.getDay()]}</div>
+                    </div>
+                    <div class="row">
+                        <div class="d-flex mt-4 ms-3 align-items-center"><i class="fa-solid fa-temperature-three-quarters fa-3x me-3"></i> <div class="fs-1">${weather.main.temp}<sup>o</sup></div></div>
+                        <div class="text">Feels like ${weather.main.feels_like}<sup>o</sup></div>
+                    </div>
+                </div>
+                <div class="col"><img src=${iconurl} alt="" class="icon-sun "> <div class="text ms-4">${weather.weather[0].description}</div></div>
+                <div class="col mt-4">
+                    <div class="text" >${sr}</div>
+                    <div class="text" >${ss}</div>
+                    <div class="text" >${weather.main.humidity}%</div>
+                    <div class="text" >${weather.wind.speed} km/h</div>
+                    <div class="text" >${dir[deg%16]}</div>
+                    <div class="text" >${weather.main.pressure} mb</div>
+                </div>
+            </div>
+            `;
+        
+        console.log(a.toLocaleDateString('en-US',{month:"long"}), a.getDay())
+        console.log(a.toLocaleDateString());
+    }
+    xhttp.open("GET","https://api.openweathermap.org/data/2.5/weather?q=Hanoi,vietnam&appid=09a71427c59d38d6a34f89b47d75975c&units=metric");
+    xhttp.send();
+</script>
+</html>
